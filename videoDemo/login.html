@@ -5,6 +5,7 @@
 		<meta charset="UTF-8">
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta http-equiv="Access-Control-Allow-Origin" content="*" />
 		<script src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js"></script>
 		<link href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css" rel="stylesheet"></link>
 		<script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>
@@ -94,9 +95,9 @@
 			<form class="mui-input-group" style="background: transparent;">
 				<div v-show="account" class="mui-input-row" style="height: 50px;border-radius:40px;border: 1px solid #A99595;">
 					<label>{{label}}</label>
-					<input v-model="iptAccount" style="" type="text" placeholder="">
+					<input v-model="iptAccount"v @blur="accBlur($event)" style="" type="text" placeholder="">
 				</div>
-				<div v-show="pwd" class="mui-input-row" style="margin-top: 4px;height: 50px;border-radius:40px;border: 1px solid #A99595;">
+				<div v-show="pwd"  class="mui-input-row" style="margin-top: 4px;height: 50px;border-radius:40px;border: 1px solid #A99595;">
 					<label>{{label2}}</label>
 					<input v-model="iptPwd" style="border-radius:40px;" type="password" class="mui-input-clear" placeholder="">
 				</div>
@@ -127,6 +128,9 @@
 			var app = new Vue({
 				el: '#app',
 				data: {
+					serverPath:'http://localhost:8080',
+					qq:'',
+					
 					account: true,
 					pwd: true,
 					repeat: false,
@@ -144,9 +148,39 @@
 					iptPwd:'',
 					iptRepeat:'', 
 					
+					ajaxData:{
+						"qq":"",
+						"pwd":""
+					}
+					
 
 				},
 				methods: {
+					init:function(){
+						mui.init({
+							gestureConfig: {
+								tap: true, //默认为true
+								doubletap: true, //默认为false
+								longtap: true, //默认为false
+								swipe: true, //默认为true
+								drag: true, //默认为true
+								hold: false, //默认为false，不监听
+								release: false //默认为false，不监听
+							}
+						});
+						
+						this.iptAccount=this.qq;
+					},
+					accBlur:function(e){
+						if(e.target.value.length>0){
+							this.ajaxData.qq=this.iptAccount;
+							var data=this.request('users','get');
+							if(data.userList.length==0){
+								mui.toast('该账户不存在')
+							}
+						}
+						
+					},
 					forget: function() {
 						console.log('gorget clk')
 						this.header = '找回密码';
@@ -226,21 +260,32 @@
 						this.btnText2 = '游客进入';
 						this.foot = true;
 					},
+					request:function(url,type){
+						var that=this;
+						var res;
+						mui.ajax({
+							url:that.serverPath+'/'+url,
+							type:type,
+							data:that.ajaxData, 
+							/*headers:{
+								"Content-Type":"application/x-www-form-urlencoded"
+							},*/
+							timeout:10000,
+							success:function(data){
+								res=data;
+							},
+							error:function(type){
+								console.log('error-type:'+type);
+							}
+						});
+						return res;
+					}
 				},
 				mounted: function() {
 					console.log('vue load success');
 					//this.forget();
-					mui.init({
-						gestureConfig: {
-							tap: true, //默认为true
-							doubletap: true, //默认为false
-							longtap: true, //默认为false
-							swipe: true, //默认为true
-							drag: true, //默认为true
-							hold: false, //默认为false，不监听
-							release: false //默认为false，不监听
-						}
-					});
+					this.init();
+					console.log(this.ajaxData.qq)
 				},
 				beforeCreate: function() {
 
@@ -249,9 +294,10 @@
 
 				},
 				watch: {
-
+ 
 				}
 			});
+			
 		</script>
 
 	</body>

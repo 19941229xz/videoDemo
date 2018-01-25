@@ -15,7 +15,7 @@
 		<link rel="stylesheet" type="text/css" href="css/iconfont.css">
 
 		<style type="text/css">
-			@font-face {
+			@font-face { 
 				font-family: 'webfont';
 				src: url('//at.alicdn.com/t/webfont_wm5zxusfu8kqehfr.eot');
 				/* IE9*/
@@ -626,7 +626,7 @@
 			<div v-show="search">
 
 				<div class="mui-input-row mui-search">
-					<input v-model="searchIpt" @input="searchChange($event)" type="search" class="mui-input-clear" placeholder="">
+					<input v-model="searchIpt" @blur="searchBlur($event)" @input="searchChange($event)" type="search" class="mui-input-clear" placeholder="">
 				</div>
 				<ul class="mui-table-view">
 					<li class="mui-table-view-cell">
@@ -1062,6 +1062,10 @@
 //					e.target.parentNode.className='mui-tab-item mui-active';
 					
 				},
+				searchBlur:function(e){
+					this.searchIpt='';
+					this.searchChange(e);
+				},
 				searchChange:function(e){
 					//css  处理
 					console.log(e.target.parentNode.nextElementSibling.children[0].style.display);
@@ -1094,7 +1098,7 @@
 					}
 				},
 				charge:function(e){
-					alert(window.navigator.userAgent.toLowerCase())
+					//alert(window.navigator.userAgent.toLowerCase())
 					//判断是否是微信
 					if(window.navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger'){
 						
